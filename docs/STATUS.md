@@ -8,7 +8,7 @@ di lingkungan Linux tanpa perangkat atau emulator Android.
 | Perintah | Hasil |
 | --- | --- |
 | `flutter analyze` | Tidak ada masalah |
-| `flutter test` | **115 test lulus**, 0 gagal |
+| `flutter test` | **116 test lulus**, 0 gagal |
 | `flutter build apk --debug` | Berhasil: `build/app/outputs/flutter-apk/app-debug.apk` |
 | `flutter build apk --release` | Berhasil (R8 + resource shrinking), APK **tidak ditandatangani** karena tidak ada `key.properties` |
 | `flutter build apk --release --split-per-abi` | Berhasil: arm64-v8a 24,5 MB, armeabi-v7a 22,4 MB, x86_64 25,9 MB |
@@ -28,7 +28,7 @@ lengkap dan widget test yang lulus di host.
 | `test/database/generated/jujur/migration_test.dart` | 2 | Skema v1→v2 tervalidasi; data v1 utuh setelah migrasi |
 | `test/database/migration_file_test.dart` | 2 | Salinan `.v1.bak` dibuat; migrasi gagal tidak mereset/menghapus berkas |
 | `test/domain/*` | 57 | Tanggal (kabisat, batas bulan/tahun, DST, awal minggu), jadwal & rangkaian, validasi aktivitas & kebiasaan, CSV (escape, BOM, formula injection), ekspor CSV/JSON & filter, statistik dari dataset yang diketahui (termasuk "belum dicatat" ≠ terlewat), waktu salat & perencana pengingat, pencarian & refleksi |
-| `test/widget/app_widget_test.dart` | 15 | Onboarding dapat dilewati; navigasi 4 tab; empty state; catat & urungkan salat; status Terlewat eksplisit; centang kebiasaan; tambah cepat + validasi; ubah aktivitas; konfirmasi buang perubahan; autosave refleksi & simpan saat keluar; tema gelap tersimpan; label aksesibilitas + pedoman target sentuh/label/kontras; navigasi tanggal; empty state riwayat & ringkasan; layar kecil + teks 160% tanpa overflow |
+| `test/widget/*` | 16 | Onboarding dapat dilewati; navigasi 4 tab; empty state; catat & urungkan salat; status Terlewat eksplisit; centang kebiasaan; tambah cepat + validasi; ubah aktivitas; konfirmasi buang perubahan; autosave refleksi & simpan saat keluar; tema gelap tersimpan; label aksesibilitas + pedoman target sentuh/label/kontras; navigasi tanggal; empty state riwayat & ringkasan; layar kecil + teks 160% tanpa overflow; empty state benar-benar di tengah layar |
 | `test/workflow/full_workflow_test.dart` | 1 | Alur lengkap §22.4 lewat UI pada berkas database nyata dengan semua koneksi jaringan diblokir: buka aplikasi → buat kebiasaan → centang → tutup & buka ulang → verifikasi → ubah salat kemarin → tulis refleksi → cadangan → hapus data → pulihkan → verifikasi → ekspor CSV → periksa isi. Tidak ada percobaan koneksi jaringan |
 
 Pemilih berkas sistem (SAF) tidak dapat dijalankan di test host, sehingga langkah cadangan dan

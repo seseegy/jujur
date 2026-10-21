@@ -27,27 +27,47 @@ class EmptyState extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: Space.page, vertical: compact ? Space.md : Space.xxxl),
-      child: Column(
-        crossAxisAlignment: compact ? CrossAxisAlignment.start : CrossAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (!compact) ...[
-            ExcludeSemantics(child: Icon(icon, size: 32, color: theme.colorScheme.onSurfaceVariant)),
-            const SizedBox(height: Space.md),
+      padding: EdgeInsets.symmetric(
+        horizontal: Space.page,
+        vertical: compact ? Space.md : Space.xxxl,
+      ),
+      // Full width so the centered layout is centered on the screen, not
+      // within the width of its longest line.
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: compact
+              ? CrossAxisAlignment.start
+              : CrossAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (!compact) ...[
+              ExcludeSemantics(
+                child: Icon(
+                  icon,
+                  size: 32,
+                  color: theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: Space.md),
+            ],
+            Text(
+              title,
+              style: theme.textTheme.titleSmall,
+              textAlign: compact ? TextAlign.start : TextAlign.center,
+            ),
+            const SizedBox(height: Space.xs),
+            Text(
+              message,
+              style: theme.textTheme.bodySmall,
+              textAlign: compact ? TextAlign.start : TextAlign.center,
+            ),
+            if (actionLabel != null && onAction != null) ...[
+              const SizedBox(height: Space.md),
+              OutlinedButton(onPressed: onAction, child: Text(actionLabel!)),
+            ],
           ],
-          Text(title, style: theme.textTheme.titleSmall, textAlign: compact ? TextAlign.start : TextAlign.center),
-          const SizedBox(height: Space.xs),
-          Text(
-            message,
-            style: theme.textTheme.bodySmall,
-            textAlign: compact ? TextAlign.start : TextAlign.center,
-          ),
-          if (actionLabel != null && onAction != null) ...[
-            const SizedBox(height: Space.md),
-            OutlinedButton(onPressed: onAction, child: Text(actionLabel!)),
-          ],
-        ],
+        ),
       ),
     );
   }
@@ -64,17 +84,27 @@ class ErrorView extends StatelessWidget {
     final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.all(Space.page),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.error_outline, color: theme.colorScheme.error),
-          const SizedBox(height: Space.sm),
-          Text(describeError(error), style: theme.textTheme.bodyMedium, textAlign: TextAlign.center),
-          if (onRetry != null) ...[
-            const SizedBox(height: Space.md),
-            OutlinedButton(onPressed: onRetry, child: const Text('Coba lagi')),
+      child: SizedBox(
+        width: double.infinity,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.error_outline, color: theme.colorScheme.error),
+            const SizedBox(height: Space.sm),
+            Text(
+              describeError(error),
+              style: theme.textTheme.bodyMedium,
+              textAlign: TextAlign.center,
+            ),
+            if (onRetry != null) ...[
+              const SizedBox(height: Space.md),
+              OutlinedButton(
+                onPressed: onRetry,
+                child: const Text('Coba lagi'),
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -90,7 +120,11 @@ class LoadingView extends StatelessWidget {
     child: Center(
       child: Semantics(
         label: label,
-        child: const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2.5)),
+        child: const SizedBox(
+          width: 24,
+          height: 24,
+          child: CircularProgressIndicator(strokeWidth: 2.5),
+        ),
       ),
     ),
   );
@@ -98,7 +132,12 @@ class LoadingView extends StatelessWidget {
 
 /// Renders loading, error and data states of an [AsyncValue] consistently.
 class AsyncView<T> extends StatelessWidget {
-  const AsyncView({super.key, required this.value, required this.data, this.onRetry});
+  const AsyncView({
+    super.key,
+    required this.value,
+    required this.data,
+    this.onRetry,
+  });
 
   final AsyncValue<T> value;
   final Widget Function(T data) data;
