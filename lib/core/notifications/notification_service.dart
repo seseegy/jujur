@@ -14,6 +14,10 @@ abstract class NotificationService {
 
   /// Replaces all pending reminders with [reminders].
   Future<void> replaceAll(List<PlannedReminder> reminders);
+
+  /// Opens Android's notification settings for this app (sound, vibration,
+  /// per-channel importance).
+  Future<void> openSystemSettings();
 }
 
 class NoopNotificationService implements NotificationService {
@@ -35,6 +39,9 @@ class NoopNotificationService implements NotificationService {
       ..clear()
       ..addAll(reminders);
   }
+
+  @override
+  Future<void> openSystemSettings() async {}
 }
 
 class LocalNotificationService implements NotificationService {
@@ -60,6 +67,12 @@ class LocalNotificationService implements NotificationService {
 
   @override
   Future<bool> requestPermission() async => await _android?.requestNotificationsPermission() ?? false;
+
+  @override
+  Future<void> openSystemSettings() async {
+    await initialize();
+    await _plugin.openAppNotificationSettings();
+  }
 
   @override
   Future<void> replaceAll(List<PlannedReminder> reminders) async {

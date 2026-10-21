@@ -36,7 +36,9 @@ abstract final class BackupCrypto {
     });
   }
 
-  static Future<(Uint8List, BackupEncryptionInfo)> encrypt(
+  /// Returns the ciphertext, its parameters, and the derived key (so the
+  /// caller can verify the result without deriving the key again).
+  static Future<(Uint8List, BackupEncryptionInfo, SecretKey)> encrypt(
     List<int> plain,
     String password, {
     int iterations = defaultIterations,
@@ -55,14 +57,16 @@ abstract final class BackupCrypto {
         salt: base64Encode(salt),
         nonce: base64Encode(nonce),
       ),
+      key,
     );
   }
 
   static Future<Uint8List> decrypt(
     List<int> data,
     String password,
-    BackupEncryptionInfo info,
-  ) async {
+    BackupEncryptionInfo info, {
+    SecretKey? derivedKey,
+  }) async {
     if (info.algorithm != algorithm || info.kdf != kdf) {
       throw const BackupException(
         BackupErrorCode.unsupportedFormat,
@@ -89,7 +93,7 @@ abstract final class BackupCrypto {
     if (data.length < 16 || nonce.length != 12) {
       throw const BackupException(BackupErrorCode.missingData, 'Isi cadangan terenkripsi tidak lengkap.');
     }
-    final key = await _deriveKey(password, salt, info.iterations);
+    final key = derivedKey ?? await _deriveKey(password, salt, info.iterations);
     final cipherText = data.sublist(0, data.length - 16);
     final mac = Mac(data.sublist(data.length - 16));
     try {

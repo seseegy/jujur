@@ -53,7 +53,14 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
     if (mounted && !ok) setState(() => _saving = false);
   }
 
-  void _next() => _pages.nextPage(duration: const Duration(milliseconds: 220), curve: Curves.easeOut);
+  void _next() {
+    // Respect the system "remove animations" preference.
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _pages.jumpToPage(_page + 1);
+    } else {
+      _pages.nextPage(duration: const Duration(milliseconds: 220), curve: Curves.easeOut);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {

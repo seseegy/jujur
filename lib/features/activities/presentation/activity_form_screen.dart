@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../app/providers.dart';
 import '../../../app/theme/app_spacing.dart';
@@ -68,7 +67,10 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
     }
   }
 
-  void _markDirty() => _dirty = true;
+  void _markDirty() {
+    // Rebuild once so PopScope starts guarding against losing the edit.
+    if (!_dirty && mounted) setState(() => _dirty = true);
+  }
 
   Future<void> _load() async {
     setState(() => _loading = true);
@@ -145,7 +147,7 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
     if (ok) {
       _dirty = false;
       showMessage(context, 'Aktivitas tersimpan.');
-      context.pop();
+      Navigator.of(context).pop();
     }
   }
 
@@ -157,7 +159,7 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
     if (!ok || !mounted) return;
     _dirty = false;
     final messenger = ScaffoldMessenger.of(context);
-    context.pop();
+    Navigator.of(context).pop();
     showUndoWith(messenger, 'Aktivitas dihapus.', () => repo.restore(original));
   }
 
@@ -166,7 +168,7 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
     final ok = await runGuarded(context, () => ref.read(activityRepositoryProvider).duplicate(_original!.id));
     if (ok && mounted) {
       showMessage(context, 'Salinan dibuat pada tanggal yang sama.');
-      context.pop();
+      Navigator.of(context).pop();
     }
   }
 
@@ -196,7 +198,7 @@ class _ActivityFormScreenState extends ConsumerState<ActivityFormScreen> {
         if (didPop) return;
         if (await _confirmDiscard() && context.mounted) {
           _dirty = false;
-          context.pop();
+          Navigator.of(context).pop();
         }
       },
       child: Scaffold(

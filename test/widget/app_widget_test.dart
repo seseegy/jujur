@@ -141,6 +141,28 @@ void main() {
     await unmountApp(tester);
   });
 
+  testWidgets('leaving the activity form with unsaved changes asks first', (tester) async {
+    await markOnboarded(db);
+    await pumpApp(tester, db);
+    await tester.tap(find.text('Catat'));
+    await settle(tester);
+    await tester.tap(find.text('Isi detail'));
+    await settle(tester);
+    await tester.enterText(find.widgetWithText(TextField, 'Judul'), 'Belum disimpan');
+    await tester.pump();
+    await tester.binding.handlePopRoute();
+    await settle(tester);
+    expect(find.text('Buang perubahan?'), findsOneWidget);
+    await tester.tap(find.text('Batal'));
+    await settle(tester);
+    expect(find.text('Aktivitas baru'), findsOneWidget);
+    await tester.tap(find.widgetWithText(FilledButton, 'Simpan'));
+    await settle(tester);
+    expect(find.text('Aktivitas baru'), findsNothing);
+    expect((await db.select(db.activities).getSingle()).title, 'Belum disimpan');
+    await unmountApp(tester);
+  });
+
   testWidgets('reflection autosaves and persists after leaving the screen', (tester) async {
     await markOnboarded(db);
     await pumpApp(tester, db);

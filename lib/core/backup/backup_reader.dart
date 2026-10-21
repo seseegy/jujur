@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 import 'package:crypto/crypto.dart';
+import 'package:cryptography/cryptography.dart' show SecretKey;
 
 import '../database/app_database.dart';
 import '../date/local_date.dart';
@@ -30,7 +31,9 @@ abstract final class BackupReader {
     return _parseManifest(archive);
   }
 
-  static Future<ValidatedBackup> read(List<int> bytes, {String? password}) async {
+  /// [derivedKey] lets the backup writer verify an archive it just
+  /// encrypted without repeating the slow key derivation.
+  static Future<ValidatedBackup> read(List<int> bytes, {String? password, SecretKey? derivedKey}) async {
     final archive = _decodeArchive(bytes);
     final manifest = _parseManifest(archive);
 
@@ -67,7 +70,7 @@ abstract final class BackupReader {
           'Cadangan ini dilindungi kata sandi.',
         );
       }
-      plain = await BackupCrypto.decrypt(payload, password, encryption);
+      plain = await BackupCrypto.decrypt(payload, password, encryption, derivedKey: derivedKey);
     }
 
     final Object? decoded;

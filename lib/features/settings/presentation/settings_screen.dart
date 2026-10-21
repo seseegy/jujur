@@ -67,11 +67,7 @@ class SettingsScreen extends ConsumerWidget {
           ),
           ListTile(
             title: const Text('Awal minggu'),
-            subtitle: Text(switch (prefs.weekStart) {
-              6 => 'Sabtu',
-              7 => 'Minggu',
-              _ => 'Senin',
-            }),
+            subtitle: const Text('Dipakai di kalender dan ringkasan mingguan.'),
             trailing: DropdownButton<int>(
               value: prefs.weekStart,
               underline: const SizedBox.shrink(),
@@ -133,6 +129,13 @@ class SettingsScreen extends ConsumerWidget {
               true => 'Diizinkan. Pengingat salat ${prefs.prayerRemindersEnabled ? 'aktif' : 'nonaktif'}.',
               false => 'Tidak diizinkan. Aplikasi tetap berfungsi penuh tanpa pengingat.',
             }),
+          ),
+          ListTile(
+            leading: const Icon(Icons.volume_up_outlined),
+            title: const Text('Suara dan getar notifikasi'),
+            subtitle: const Text('Diatur per jenis pengingat di pengaturan Android.'),
+            trailing: const Icon(Icons.open_in_new),
+            onTap: () => runGuarded(context, () => ref.read(notificationServiceProvider).openSystemSettings()),
           ),
           ListTile(
             leading: const Icon(Icons.update),

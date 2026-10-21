@@ -119,7 +119,12 @@ class _Body extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(habit.name, style: theme.textTheme.headlineSmall),
+              Row(
+                children: [
+                  if (habit.color != null) ...[HabitColorDot(colorId: habit.color, size: 14), const SizedBox(width: Space.sm)],
+                  Expanded(child: Text(habit.name, style: theme.textTheme.headlineSmall)),
+                ],
+              ),
               if (habit.description != null) ...[
                 const SizedBox(height: Space.xs),
                 Text(habit.description!, style: theme.textTheme.bodyMedium),

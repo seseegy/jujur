@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/providers.dart';
+import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../../core/date/local_date.dart';
 import '../../../core/date/time_of_day_minutes.dart';
@@ -38,6 +39,7 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
   late LocalDate _start = ref.read(todayProvider);
   LocalDate? _end;
   String? _categoryId;
+  String? _color;
   int? _reminder;
   bool _loading = false;
   bool _saving = false;
@@ -75,6 +77,7 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
       _start = LocalDate.parse(h.startDate);
       _end = LocalDate.tryParse(h.endDate);
       _categoryId = h.categoryId;
+      _color = h.color;
       _reminder = h.reminderMinute;
       _hasRecords = count > 0;
       _loading = false;
@@ -93,6 +96,7 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
     name: _name.text,
     description: _description.text,
     categoryId: _categoryId,
+    color: _color,
     trackingType: _type,
     targetUnit: _unit.text,
     startDate: _start,
@@ -196,6 +200,17 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
                     for (final c in categories) DropdownMenuItem(value: c.id, child: Text(c.name)),
                   ],
                   onChanged: (v) => setState(() => _categoryId = v),
+                ),
+                const SizedBox(height: Space.lg),
+                Text('Warna penanda (opsional)', style: theme.textTheme.bodySmall),
+                const SizedBox(height: Space.xs),
+                Wrap(
+                  spacing: Space.xs,
+                  children: [
+                    _ColorOption(color: null, selected: _color == null, onTap: () => setState(() => _color = null)),
+                    for (final c in HabitColor.all)
+                      _ColorOption(color: c, selected: _color == c.id, onTap: () => setState(() => _color = c.id)),
+                  ],
                 ),
                 const SizedBox(height: Space.xl),
                 Text('Cara mencatat', style: theme.textTheme.titleSmall),
@@ -309,6 +324,46 @@ class _HabitFormScreenState extends ConsumerState<HabitFormScreen> {
                 FilledButton(onPressed: _saving ? null : _save, child: Text(_saving ? 'Menyimpan…' : 'Simpan')),
               ],
             ),
+    );
+  }
+}
+
+class _ColorOption extends StatelessWidget {
+  const _ColorOption({required this.color, required this.selected, required this.onTap});
+
+  final HabitColor? color;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    final fill = color?.resolve(context);
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: color?.label ?? 'Tanpa warna',
+      excludeSemantics: true,
+      child: InkResponse(
+        onTap: onTap,
+        radius: 24,
+        child: SizedBox(
+          width: minTouchTarget,
+          height: minTouchTarget,
+          child: Center(
+            child: Container(
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(
+                color: fill,
+                shape: BoxShape.circle,
+                border: Border.all(color: selected ? scheme.onSurface : scheme.outline, width: selected ? 2.5 : 1),
+              ),
+              child: fill == null ? Icon(Icons.block, size: 16, color: scheme.onSurfaceVariant) : null,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }

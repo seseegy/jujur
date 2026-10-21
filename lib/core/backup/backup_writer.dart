@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:archive/archive.dart';
 import 'package:crypto/crypto.dart';
+import 'package:cryptography/cryptography.dart' show SecretKey;
 
 import '../database/app_database.dart';
 import 'backup_crypto.dart';
@@ -38,14 +39,16 @@ class BackupWriter {
 
     Uint8List payload;
     BackupEncryptionInfo? encryption;
+    SecretKey? key;
     if (password != null && password.isNotEmpty) {
-      final (cipher, info) = await BackupCrypto.encrypt(
+      final (cipher, info, derived) = await BackupCrypto.encrypt(
         plain,
         password,
         iterations: iterations ?? BackupCrypto.defaultIterations,
       );
       payload = cipher;
       encryption = info;
+      key = derived;
     } else {
       payload = Uint8List.fromList(plain);
     }
@@ -72,7 +75,7 @@ class BackupWriter {
 
     // Never report success for an archive that cannot be restored: parse and
     // fully validate what was just produced.
-    final check = await BackupReader.read(bytes, password: password);
+    final check = await BackupReader.read(bytes, password: password, derivedKey: key);
     if (check.data.recordCount != data.recordCount) {
       throw const BackupException(
         BackupErrorCode.countMismatch,

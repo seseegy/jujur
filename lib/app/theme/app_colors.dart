@@ -87,3 +87,26 @@ class StatusColors extends ThemeExtension<StatusColors> {
     );
   }
 }
+
+/// Restrained palette for optional habit identifiers. Stored by [id].
+class HabitColor {
+  const HabitColor(this.id, this.label, this.light, this.dark);
+  final String id;
+  final String label;
+  final Color light;
+  final Color dark;
+
+  Color resolve(BuildContext context) =>
+      Theme.of(context).brightness == Brightness.dark ? dark : light;
+
+  static const all = [
+    HabitColor('forest', 'Hijau', Color(0xFF2F6B4A), Color(0xFF8CC9A3)),
+    HabitColor('slate', 'Biru keabuan', Color(0xFF3F5E78), Color(0xFF9DB8CF)),
+    HabitColor('clay', 'Tanah liat', Color(0xFF9A4F37), Color(0xFFE0A28C)),
+    HabitColor('ochre', 'Oker', Color(0xFF8A6A12), Color(0xFFD9BC6A)),
+    HabitColor('plum', 'Ungu tua', Color(0xFF6B4A6E), Color(0xFFC5A3C8)),
+    HabitColor('stone', 'Batu', Color(0xFF5F625C), Color(0xFFB4B7B0)),
+  ];
+
+  static HabitColor? byId(String? id) => all.where((c) => c.id == id).firstOrNull;
+}

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/providers.dart';
+import '../../../app/theme/app_colors.dart';
 import '../../../app/theme/app_spacing.dart';
 import '../../../core/formatters/formatters.dart';
 import '../../../core/widgets/feedback.dart';
@@ -75,6 +76,7 @@ class HabitsScreen extends ConsumerWidget {
                         final d = habits[i];
                         return ListTile(
                           key: ValueKey(d.habit.id),
+                          leading: HabitColorDot(colorId: d.habit.color),
                           title: Text(d.habit.name),
                           subtitle: Text(habitSummary(d)),
                           onTap: () => context.push('/habits/${d.habit.id}'),
@@ -95,6 +97,7 @@ class HabitsScreen extends ConsumerWidget {
                         for (final d in habits)
                           ListTile(
                             key: ValueKey(d.habit.id),
+                            leading: HabitColorDot(colorId: d.habit.color),
                             title: Text(d.habit.name),
                             subtitle: Text(habitSummary(d)),
                             onTap: () => context.push('/habits/${d.habit.id}'),
@@ -103,6 +106,29 @@ class HabitsScreen extends ConsumerWidget {
                     ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Small identifier dot for a habit's optional color.
+class HabitColorDot extends StatelessWidget {
+  const HabitColorDot({super.key, required this.colorId, this.size = 12});
+  final String? colorId;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = HabitColor.byId(colorId);
+    return ExcludeSemantics(
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: color?.resolve(context),
+          border: color == null ? Border.all(color: Theme.of(context).colorScheme.outline) : null,
         ),
       ),
     );
